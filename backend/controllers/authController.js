@@ -34,6 +34,14 @@ exports.login = (req, res) => {
 
     const token = jwt.sign({ id: user.id, role: user.role }, "secretkey", { expiresIn: "1d" });
 
-    res.json({ message: "Login Successful", token });
+  res.json({
+  message: "Login Successful",
+  token,
+  user: {
+    id: user.id,
+    role: user.role
+  }
+});
+
   });
 };

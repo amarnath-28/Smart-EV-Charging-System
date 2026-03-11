@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Slot — EVCharge</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <a href="/" class="logo">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text">EV<span>Charge</span></span>
+    </a>
+    <nav>
+      <a href="stations.html">Stations</a>
+      <a href="myBookings.html">My Bookings</a>
+      <button class="nav-btn nav-btn-outline" onclick="logout()">Log Out</button>
+    </nav>
+  </div>
+
+  <div class="page-wrapper">
+    <div class="page-header fade-in">
+      <div class="breadcrumb">
+        <a href="stations.html">← Back to Stations</a>
+      </div>
+      <h1>🔌 Available Slots</h1>
+      <p>Choose a time slot to book your charging session</p>
+    </div>
+
+    <div id="slots" class="slots-grid"></div>
+
+    <div class="qr-section" id="qrSection">
+      <h3>🎉 Booking Confirmed!</h3>
+      <p>Show this QR code at the station for check-in</p>
+      <img id="qrImage" src="" alt="Booking QR Code">
+    </div>
+  </div>
+
+<script src="js/booking.js"></script>
+
+</body>
+</html>
