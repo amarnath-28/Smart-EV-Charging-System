@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings — EVCharge</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <a href="/" class="logo">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text">EV<span>Charge</span></span>
+    </a>
+    <nav>
+      <a href="stations.html">Stations</a>
+      <a href="myBookings.html" class="active">My Bookings</a>
+      <button class="nav-btn nav-btn-outline" onclick="logout()">Log Out</button>
+    </nav>
+  </div>
+
+  <div class="page-wrapper">
+    <div class="page-header fade-in">
+      <h1>📋 My Bookings</h1>
+      <p>View and manage all your charging slot bookings</p>
+    </div>
+
+    <div id="bookings" class="bookings-list"></div>
+  </div>
+
+<script src="js/myBookings.js"></script>
+
+</body>
+</html>

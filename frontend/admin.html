@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — EVCharge</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+  <!-- Admin Sidebar -->
+  <aside class="admin-sidebar fade-in">
+    <div class="sidebar-header">
+      <a href="/" class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">EV<span>Admin</span></span>
+      </a>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-target="analytics">
+        <span class="nav-icon">📊</span> Analytics
+      </a>
+      <a href="#" class="nav-item" data-target="users">
+        <span class="nav-icon">👥</span> Users
+      </a>
+      <a href="#" class="nav-item" data-target="bookings">
+        <span class="nav-icon">📅</span> Bookings
+      </a>
+      <a href="#" class="nav-item" data-target="stations">
+        <span class="nav-icon">🏢</span> Stations
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <button class="btn btn-outline btn-full" onclick="logout()">Log Out</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main fade-in">
+    <header class="admin-topbar">
+      <h2>Welcome, Admin <span id="admin-name"></span></h2>
+    </header>
+
+    <div class="admin-content-area">
+      
+      <!-- Analytics Tab -->
+      <section id="analytics" class="admin-section active">
+        <div class="section-header">
+          <h3>System Analytics</h3>
+        </div>
+        <div class="analytics-grid" id="analytics-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Users Tab -->
+      <section id="users" class="admin-section">
+        <div class="section-header">
+          <h3>Manage Users</h3>
+        </div>
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Bookings Tab -->
+      <section id="bookings" class="admin-section">
+        <div class="section-header">
+          <h3>Manage Bookings</h3>
+        </div>
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Station</th>
+                <th>Slot</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Stations Tab -->
+      <section id="stations" class="admin-section">
+        <div class="section-header">
+          <h3>Manage Stations</h3>
+        </div>
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Total Slots</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="stations-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+      
+    </div>
+  </main>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — EVCharge</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card fade-in">
+      <div class="auth-icon">🚗</div>
+      <h2>Create account</h2>
+      <p class="auth-subtitle">Join EVCharge and start booking charging slots</p>
+
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="John Doe">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="you@example.com">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Create a strong password">
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="text" id="phone" placeholder="+91 98765 43210">
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="register()">Create Account</button>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+function register() {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const phone = document.getElementById("phone").value;
+
+  if (!name || !email || !password || !phone) {
+    showToast("Please fill in all fields", "error");
+    return;
+  }
+
+  fetch('http://localhost:5000/api/auth/register', {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password, phone })
+  })
+  .then(res => res.json())
+  .then(data => {
+    showToast(data.message || "Registered successfully!", "success");
+    setTimeout(() => { window.location.href = "login.html"; }, 1000);
+  })
+  .catch(() => {
+    showToast("Server error. Please try again.", "error");
+  });
+}
+
+function showToast(message, type) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span>
+    <span>${message}</span>
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+document.querySelectorAll('.form-group input').forEach(input => {
+  input.addEventListener('keypress', e => {
+    if (e.key === 'Enter') register();
+  });
+});
+</script>
+
+</body>
+</html>

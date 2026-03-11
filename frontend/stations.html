@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stations — EVCharge</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <a href="/" class="logo">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text">EV<span>Charge</span></span>
+    </a>
+    <nav>
+      <a href="stations.html" class="active">Stations</a>
+      <a href="myBookings.html">My Bookings</a>
+      <button class="nav-btn nav-btn-outline" onclick="logout()">Log Out</button>
+    </nav>
+  </div>
+
+  <div class="page-wrapper">
+    <div class="page-header fade-in">
+      <h1>⚡ Charging Stations</h1>
+      <p>Browse available stations and book a slot to charge your EV</p>
+    </div>
+
+    <div id="stations" class="stations-grid"></div>
+  </div>
+
+<script>
+const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "login.html";
+}
+
+fetch('http://localhost:5000/api/stations')
+  .then(res => res.json())
+  .then(data => {
+    let output = "";
+
+    if (data.length === 0) {
+      output = `
+        <div class="empty-state">
+          <div class="empty-icon">🔌</div>
+          <h3>No stations available</h3>
+          <p>Check back later for new charging stations</p>
+        </div>
+      `;
+    } else {
+      data.forEach((station, index) => {
+        const availPercent = Math.round((station.available_slots / station.total_slots) * 100);
+        const statusColor = availPercent > 50 ? 'var(--accent)' : availPercent > 20 ? 'var(--warning)' : 'var(--danger)';
+
+        output += `
+          <div class="station-card fade-in" style="animation-delay: ${index * 0.08}s; opacity: 0;">
+            <div class="station-icon">🏢</div>
+            <h3>${station.name}</h3>
+            <div class="station-location">
+              📍 ${station.location}
+            </div>
+            <div class="station-meta">
+              <div class="meta-item">
+                <span>🔋</span>
+                <span>Total: <span class="meta-value">${station.total_slots}</span></span>
+              </div>
+              <div class="meta-item">
+                <span style="color: ${statusColor};">●</span>
+                <span>Available: <span class="meta-value" style="color: ${statusColor};">${station.available_slots}</span></span>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="viewSlots(${station.id})">
+              View Available Slots →
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    document.getElementById("stations").innerHTML = output;
+  });
+
+function viewSlots(id) {
+  window.location.href = "booking.html?stationId=" + id;
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("userId");
+  window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>
