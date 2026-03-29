@@ -70,6 +70,7 @@
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Role</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="users-table-body">
@@ -106,8 +107,41 @@
 
       <!-- Stations Tab -->
       <section id="stations" class="admin-section">
-        <div class="section-header">
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
           <h3>Manage Stations</h3>
+          <button class="btn btn-primary" onclick="toggleAddStationForm()">+ Add Station</button>
+        </div>
+        
+        <div id="add-station-form-container" style="display: none; background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
+          <h4 style="margin-bottom: 15px;">Add New Station</h4>
+          <form id="add-station-form" onsubmit="addStation(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="new-station-name" required placeholder="Station Name" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border); width: 100%; background: var(--bg); color: var(--text);">
+              </div>
+              <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="new-station-location" required placeholder="e.g. MG Road, Bangalore" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border); width: 100%; background: var(--bg); color: var(--text);">
+              </div>
+              <div class="form-group">
+                <label>Latitude (Optional)</label>
+                <input type="number" step="any" id="new-station-lat" placeholder="e.g. 12.9715" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border); width: 100%; background: var(--bg); color: var(--text);">
+              </div>
+              <div class="form-group">
+                <label>Longitude (Optional)</label>
+                <input type="number" step="any" id="new-station-lng" placeholder="e.g. 77.5945" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border); width: 100%; background: var(--bg); color: var(--text);">
+              </div>
+              <div class="form-group">
+                <label>Total Slots</label>
+                <input type="number" id="new-station-slots" required min="1" placeholder="e.g. 5" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border); width: 100%; background: var(--bg); color: var(--text);">
+              </div>
+            </div>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+              <button type="submit" class="btn btn-primary">Save Station</button>
+              <button type="button" class="btn btn-outline" onclick="toggleAddStationForm()">Cancel</button>
+            </div>
+          </form>
         </div>
         <div class="table-container">
           <table class="admin-table">

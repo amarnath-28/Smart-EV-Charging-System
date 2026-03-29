@@ -91,7 +91,7 @@ async function fetchUsers() {
     const data = await authFetch("http://localhost:5000/api/admin/users");
     const tbody = document.getElementById("users-table-body");
     
-    tbody.innerHTML = data.length === 0 ? `<tr><td colspan="5" style="text-align:center;">No users found</td></tr>` : '';
+    tbody.innerHTML = data.length === 0 ? `<tr><td colspan="6" style="text-align:center;">No users found</td></tr>` : '';
     
     data.forEach(user => {
       tbody.innerHTML += `
@@ -101,6 +101,9 @@ async function fetchUsers() {
           <td>${user.email}</td>
           <td>${user.phone || 'N/A'}</td>
           <td><span class="badge ${user.role === 'admin' ? 'badge-approved' : 'badge-pending'}">${user.role.toUpperCase()}</span></td>
+          <td>
+            ${user.role !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id}, '${user.name.replace(/'/g, "\\'") }')">Delete</button>` : '<span style="color:var(--text-muted); font-size:13px;">N/A</span>'}
+          </td>
         </tr>
       `;
     });
@@ -215,6 +218,62 @@ async function deleteStation(stationId, stationName) {
   } catch (error) {
     console.error("Error deleting station:", error);
     alert("Failed to delete station");
+  }
+}
+
+async function deleteUser(userId, userName) {
+  if (!confirm(`DANGER! Are you sure you want to delete user "${userName}" and all their bookings? This action cannot be undone.`)) return;
+
+  try {
+    const data = await authFetch(`http://localhost:5000/api/admin/users/${userId}`, {
+      method: "DELETE"
+    });
+    
+    if (data.message) {
+      alert(data.message);
+      fetchUsers(); // Refresh list
+    }
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    alert("Failed to delete user");
+  }
+}
+
+function toggleAddStationForm() {
+  const formStr = document.getElementById('add-station-form-container');
+  if (formStr.style.display === 'none') {
+    formStr.style.display = 'block';
+  } else {
+    formStr.style.display = 'none';
+  }
+}
+
+async function addStation(e) {
+  e.preventDefault();
+  
+  const payload = {
+    name: document.getElementById('new-station-name').value,
+    location: document.getElementById('new-station-location').value,
+    latitude: document.getElementById('new-station-lat').value || null,
+    longitude: document.getElementById('new-station-lng').value || null,
+    total_slots: document.getElementById('new-station-slots').value
+  };
+
+  try {
+    const data = await authFetch(`http://localhost:5000/api/admin/stations`, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    
+    if (data.message) {
+      alert(data.message);
+      document.getElementById('add-station-form').reset();
+      toggleAddStationForm();
+      fetchStations(); // Refresh list
+    }
+  } catch (error) {
+    console.error("Error adding station:", error);
+    alert("Failed to add station");
   }
 }
 

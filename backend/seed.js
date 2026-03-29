@@ -1,9 +1,9 @@
 const db = require('./config/db');
 
-const stationsSql = `INSERT INTO stations (name, location, total_slots, available_slots, staff_id) VALUES 
-('GreenCharge Hub', 'MG Road, Bangalore', 5, 5, NULL),
-('PowerUp Station', 'Anna Nagar, Chennai', 5, 5, NULL),
-('EcoVolt Center', 'Banjara Hills, Hyderabad', 5, 5, NULL)`;
+const stationsSql = `INSERT INTO stations (name, location, latitude, longitude, total_slots, available_slots, staff_id) VALUES 
+('GreenCharge Hub', 'MG Road, Bangalore', 12.9715987, 77.5945627, 5, 5, NULL),
+('PowerUp Station', 'Anna Nagar, Chennai', 13.0850022, 80.2100466, 5, 5, NULL),
+('EcoVolt Center', 'Banjara Hills, Hyderabad', 17.4156066, 78.4396349, 5, 5, NULL)`;
 
 db.query(stationsSql, (err, r) => {
   if (err) {

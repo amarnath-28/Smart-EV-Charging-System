@@ -105,3 +105,38 @@ exports.deleteStation = (req, res) => {
     res.json({ message: "Station deleted successfully" });
   });
 };
+
+// Delete user
+exports.deleteUser = (req, res) => {
+  const userId = req.params.userId;
+
+  // First delete associated bookings
+  const deleteBookings = "DELETE FROM bookings WHERE user_id = ?";
+  db.query(deleteBookings, [userId], (err) => {
+    if (err) console.error("Error deleting user bookings:", err);
+    
+    // Then delete the user
+    const deleteUserSql = "DELETE FROM users WHERE id = ?";
+    db.query(deleteUserSql, [userId], (err2, result) => {
+      if (err2) return res.status(500).json(err2);
+      if (result.affectedRows === 0) return res.status(404).json({ message: "User not found" });
+      
+      res.json({ message: "User deleted successfully" });
+    });
+  });
+};
+
+// Add station
+exports.addStation = (req, res) => {
+  const { name, location, latitude, longitude, total_slots } = req.body;
+  if (!name || !location || !total_slots) {
+    return res.status(400).json({ message: "Name, location, and total_slots are required" });
+  }
+
+  const sql = `INSERT INTO stations (name, location, latitude, longitude, total_slots, available_slots, staff_id) VALUES (?, ?, ?, ?, ?, ?, NULL)`;
+  
+  db.query(sql, [name, location, latitude || null, longitude || null, total_slots, total_slots], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: "Station added successfully", stationId: result.insertId });
+  });
+};

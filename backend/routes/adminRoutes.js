@@ -11,5 +11,7 @@ router.get('/bookings', adminController.getAllBookings);
 router.put('/bookings/:bookingId', adminController.updateBookingStatus);
 router.get('/analytics', adminController.getAnalytics);
 router.delete('/stations/:stationId', adminController.deleteStation);
+router.post('/stations', adminController.addStation);
+router.delete('/users/:userId', adminController.deleteUser);
 
 module.exports = router;
