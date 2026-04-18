@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Fetch data based on selected tab
       if (target === "analytics") fetchAnalytics();
       if (target === "users") fetchUsers();
+      if (target === "staff") fetchStaff();
       if (target === "bookings") fetchBookings();
       if (target === "stations") fetchStations();
     });
@@ -49,8 +50,8 @@ async function authFetch(url, options = {}) {
   
   const response = await fetch(url, { ...options, headers });
   if (response.status === 401 || response.status === 403) {
-    alert("Session expired or unauthorized. Please login again.");
-    logout();
+    showToast("Session expired or unauthorized. Please login again.", "error");
+    setTimeout(() => logout(), 1500);
   }
   return response.json();
 }
@@ -109,6 +110,32 @@ async function fetchUsers() {
     });
   } catch (error) {
     console.error("Error fetching users:", error);
+  }
+}
+
+async function fetchStaff() {
+  try {
+    const data = await authFetch("http://localhost:5000/api/admin/staff");
+    const tbody = document.getElementById("staff-table-body");
+    
+    tbody.innerHTML = data.length === 0 ? `<tr><td colspan="6" style="text-align:center;">No staff found</td></tr>` : '';
+    
+    data.forEach(user => {
+      tbody.innerHTML += `
+        <tr>
+          <td>#${user.id}</td>
+          <td><strong>${user.name}</strong></td>
+          <td>${user.email}</td>
+          <td>${user.phone || 'N/A'}</td>
+          <td><span class="badge badge-approved">${user.role.toUpperCase()}</span></td>
+          <td>
+            <button class="btn btn-danger btn-sm" onclick="deleteStaff(${user.id}, '${user.name.replace(/'/g, "\\'") }')">Delete</button>
+          </td>
+        </tr>
+      `;
+    });
+  } catch (error) {
+    console.error("Error fetching staff:", error);
   }
 }
 
@@ -185,7 +212,7 @@ async function fetchStations() {
 
 // Action handlers
 async function updateBooking(bookingId, status) {
-  if (!confirm(`Are you sure you want to mark this booking as ${status}?`)) return;
+  if (!(await showConfirmModal(`Are you sure you want to mark this booking as ${status}?`, "Update Booking"))) return;
 
   try {
     const data = await authFetch(`http://localhost:5000/api/admin/bookings/${bookingId}`, {
@@ -194,17 +221,17 @@ async function updateBooking(bookingId, status) {
     });
     
     if (data.message) {
-      alert(data.message);
+      showToast(data.message, "success");
       fetchBookings(); // Refresh list
     }
   } catch (error) {
     console.error("Error updating booking:", error);
-    alert("Failed to update booking status");
+    showToast("Failed to update booking status", "error");
   }
 }
 
 async function deleteStation(stationId, stationName) {
-  if (!confirm(`DANGER! Are you sure you want to delete station "${stationName}"? This action cannot be undone.`)) return;
+  if (!(await showConfirmModal(`DANGER! Are you sure you want to delete station "${stationName}"? This action cannot be undone.`, "Delete Station"))) return;
 
   try {
     const data = await authFetch(`http://localhost:5000/api/admin/stations/${stationId}`, {
@@ -212,17 +239,17 @@ async function deleteStation(stationId, stationName) {
     });
     
     if (data.message) {
-      alert(data.message);
+      showToast(data.message, "success");
       fetchStations(); // Refresh list
     }
   } catch (error) {
     console.error("Error deleting station:", error);
-    alert("Failed to delete station");
+    showToast("Failed to delete station", "error");
   }
 }
 
 async function deleteUser(userId, userName) {
-  if (!confirm(`DANGER! Are you sure you want to delete user "${userName}" and all their bookings? This action cannot be undone.`)) return;
+  if (!(await showConfirmModal(`DANGER! Are you sure you want to delete user "${userName}" and all their bookings? This action cannot be undone.`, "Delete User"))) return;
 
   try {
     const data = await authFetch(`http://localhost:5000/api/admin/users/${userId}`, {
@@ -230,12 +257,30 @@ async function deleteUser(userId, userName) {
     });
     
     if (data.message) {
-      alert(data.message);
+      showToast(data.message, "success");
       fetchUsers(); // Refresh list
     }
   } catch (error) {
     console.error("Error deleting user:", error);
-    alert("Failed to delete user");
+    showToast("Failed to delete user", "error");
+  }
+}
+
+async function deleteStaff(staffId, staffName) {
+  if (!(await showConfirmModal(`DANGER! Are you sure you want to delete staff "${staffName}"? This action cannot be undone.`, "Delete Staff"))) return;
+
+  try {
+    const data = await authFetch(`http://localhost:5000/api/admin/users/${staffId}`, {
+      method: "DELETE"
+    });
+    
+    if (data.message) {
+      showToast(data.message, "success");
+      fetchStaff(); // Refresh list
+    }
+  } catch (error) {
+    console.error("Error deleting staff:", error);
+    showToast("Failed to delete staff", "error");
   }
 }
 
@@ -266,14 +311,51 @@ async function addStation(e) {
     });
     
     if (data.message) {
-      alert(data.message);
+      showToast(data.message, "success");
       document.getElementById('add-station-form').reset();
       toggleAddStationForm();
       fetchStations(); // Refresh list
     }
   } catch (error) {
     console.error("Error adding station:", error);
-    alert("Failed to add station");
+    showToast("Failed to add station", "error");
+  }
+}
+
+function toggleAddStaffForm() {
+  const formStr = document.getElementById('add-staff-form-container');
+  if (formStr.style.display === 'none') {
+    formStr.style.display = 'block';
+  } else {
+    formStr.style.display = 'none';
+  }
+}
+
+async function addStaff(e) {
+  e.preventDefault();
+  
+  const payload = {
+    name: document.getElementById('new-staff-name').value,
+    email: document.getElementById('new-staff-email').value,
+    password: document.getElementById('new-staff-password').value,
+    phone: document.getElementById('new-staff-phone').value || null
+  };
+
+  try {
+    const data = await authFetch(`http://localhost:5000/api/admin/staff`, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    
+    if (data.message) {
+      showToast(data.message, "success");
+      document.getElementById('add-staff-form').reset();
+      toggleAddStaffForm();
+      fetchStaff(); // Refresh list
+    }
+  } catch (error) {
+    console.error("Error adding staff:", error);
+    showToast("Failed to add staff", "error");
   }
 }
 

@@ -1,13 +1,50 @@
 const db = require('../config/db');
+const bcrypt = require('bcryptjs');
 
 // Get all users
 exports.getAllUsers = (req, res) => {
-  const sql = "SELECT id, name, email, role, phone FROM users ORDER BY id DESC";
+  const sql = "SELECT id, name, email, role, phone FROM users WHERE role = 'user' ORDER BY id DESC";
 
   db.query(sql, (err, result) => {
     if (err) return res.status(500).json(err);
     res.json(result);
   });
+};
+
+// Get all staff
+exports.getStaff = (req, res) => {
+  const sql = "SELECT id, name, email, role, phone FROM users WHERE role = 'staff' ORDER BY id DESC";
+
+  db.query(sql, (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result);
+  });
+};
+
+// Add new staff
+exports.addStaff = async (req, res) => {
+  const { name, email, phone, password } = req.body;
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: "Name, email, and password are required" });
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const sql = "INSERT INTO users (name, email, password, phone, role) VALUES (?, ?, ?, ?, 'staff')";
+    db.query(sql, [name, email, hashedPassword, phone || null], (err, result) => {
+      if (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+          return res.status(400).json({ message: "Email already exists" });
+        }
+        return res.status(500).json(err);
+      }
+      res.status(201).json({ message: "Staff added successfully", staffId: result.insertId });
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error encrypting password" });
+  }
 };
 
 // Get all bookings

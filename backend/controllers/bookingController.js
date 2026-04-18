@@ -28,7 +28,7 @@ exports.bookSlot = (req, res) => {
     }
 
     const getStation = "SELECT station_id FROM slots WHERE id=?";
-    
+
     db.query(getStation, [slot_id], async (err, data) => {
       if (err) return res.status(500).json(err);
 

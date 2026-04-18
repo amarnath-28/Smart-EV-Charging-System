@@ -71,8 +71,8 @@ fetch(`http://localhost:5000/api/booking/my-bookings`, {
 
 
 // Cancel booking function
-function cancelBooking(bookingId) {
-  if (!confirm("Are you sure you want to cancel this booking?")) {
+async function cancelBooking(bookingId) {
+  if (!(await showConfirmModal("Are you sure you want to cancel this booking?", "Cancel Booking"))) {
     return;
   }
 
@@ -90,20 +90,6 @@ function cancelBooking(bookingId) {
   .catch(() => {
     showToast("Server error. Please try again.", "error");
   });
-}
-
-function showToast(message, type) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `
-    <span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span>
-    <span>${message}</span>
-  `;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
 }
 
 function logout() {

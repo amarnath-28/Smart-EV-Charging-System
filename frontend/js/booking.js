@@ -48,8 +48,8 @@ if (stationId) {
                   <div class="slot-status">● Available</div>
                 </div>
               </div>
-              <button class="btn btn-success btn-sm" onclick="bookSlot(${slot.id})">
-                Book
+              <button id="btn-${slot.id}" class="btn btn-success btn-sm" onclick="processPaymentAndBook(${slot.id})">
+                Pay & Book
               </button>
             </div>
           `;
@@ -60,53 +60,115 @@ if (stationId) {
     });
 }
 
-// Book slot function
-function bookSlot(slotId) {
-  fetch("http://localhost:5000/api/booking/book", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
-    },
-    body: JSON.stringify({
-      slot_id: slotId
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.qr_code) {
-      showToast("Slot booked successfully! 🎉", "success");
+// Razorpay Payment and Booking Flow
+async function processPaymentAndBook(slotId) {
+  const btn = document.getElementById(`btn-${slotId}`);
+  const originalText = btn.innerHTML;
+  
+  try {
+    btn.innerHTML = `⏳ Processing...`;
+    btn.disabled = true;
 
-      const qrSection = document.getElementById("qrSection");
-      const qrImg = document.getElementById("qrImage");
-      qrImg.src = data.qr_code;
-      qrSection.classList.add("visible");
-      qrSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // 1. Create order via Backend
+    const amount = 100; // Fixed amount for testing
+    const orderResponse = await fetch("http://localhost:5000/api/payment/create-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ amount, slot_id: slotId })
+    });
 
-      // Refresh slots
-      setTimeout(() => location.reload(), 2000);
-    } else {
-      showToast(data.message || "Booking failed", "error");
+    const orderData = await orderResponse.json();
+    
+    if (!orderResponse.ok) {
+      throw new Error(orderData.message || "Failed to create order");
     }
-  })
-  .catch(() => {
-    showToast("Server error. Please try again.", "error");
-  });
+
+    // 2. Configure Razorpay parameters
+    const options = {
+      key: "rzp_test_Sf1S2V1e1suBmj", 
+      amount: orderData.amount,
+      currency: orderData.currency,
+      name: "EV Charging",
+      description: "Slot Booking Payment",
+      order_id: orderData.order_id,
+      prefill: {
+        name: "EV Charging Client",
+        email: "client@evcharge.com",
+        contact: "9876543210"
+      },
+      method: {
+        upi: true,
+        card: true,
+        netbanking: true,
+        wallet: true
+      },
+      handler: async function (response) {
+        // 3. Verify Payment with Backend
+        showToast("Payment Successful! Verifying booking...", "info");
+        
+        try {
+          const verifyRes = await fetch("http://localhost:5000/api/payment/verify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              slot_id: slotId
+            })
+          });
+          
+          const verifyData = await verifyRes.json();
+          
+          if (verifyRes.ok && verifyData.qr_code) {
+            showToast("Slot booked successfully! 🎉", "success");
+            const qrSection = document.getElementById("qrSection");
+            const qrImg = document.getElementById("qrImage");
+            qrImg.src = verifyData.qr_code;
+            qrSection.classList.add("visible");
+            qrSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Refresh slots after short delay
+            setTimeout(() => location.reload(), 3000);
+          } else {
+            showToast(verifyData.message || "Booking verification failed", "error");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }
+        } catch (err) {
+          showToast("Payment verified but error creating booking", "error");
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      },
+      theme: {
+        color: "#1fc600"
+      }
+    };
+
+    // 4. Open Razorpay Checkout Window
+    const rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response){
+      showToast("Payment Failed: " + response.error.description, "error");
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    });
+    rzp1.open();
+
+  } catch (error) {
+    showToast(error.message || "Error initiating payment", "error");
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
 }
 
-function showToast(message, type) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `
-    <span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span>
-    <span>${message}</span>
-  `;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3500);
-}
+// Removed local showToast as UI is now global
 
 function logout() {
   localStorage.removeItem("token");

@@ -59,6 +59,8 @@ function login() {
       setTimeout(() => { 
         if (data.user.role === 'admin') {
           window.location.href = "admin.html";
+        } else if (data.user.role === 'staff') {
+          window.location.href = "staff.html";
         } else {
           window.location.href = "stations.html"; 
         }

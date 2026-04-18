@@ -20,6 +20,12 @@ app.use('/api/booking', bookingRoutes);
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/api/admin', adminRoutes);
 
+const staffRoutes = require('./routes/staffRoutes');
+app.use('/api/staff', staffRoutes);
+
+const paymentRoutes = require('./routes/paymentRoutes');
+app.use('/api/payment', paymentRoutes);
+
 app.get('/', (req, res) => {
   res.send("EV Charging Server Running 🚗⚡");
 });

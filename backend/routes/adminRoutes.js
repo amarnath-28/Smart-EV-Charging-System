@@ -7,6 +7,8 @@ const adminController = require('../controllers/adminController');
 router.use(verifyAdmin);
 
 router.get('/users', adminController.getAllUsers);
+router.get('/staff', adminController.getStaff);
+router.post('/staff', adminController.addStaff);
 router.get('/bookings', adminController.getAllBookings);
 router.put('/bookings/:bookingId', adminController.updateBookingStatus);
 router.get('/analytics', adminController.getAnalytics);

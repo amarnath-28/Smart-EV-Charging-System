@@ -29,3 +29,13 @@ exports.verifyAdmin = (req, res, next) => {
     }
   });
 };
+
+exports.verifyStaff = (req, res, next) => {
+  exports.verifyToken(req, res, () => {
+    if (req.user && req.user.role === 'staff') {
+      next();
+    } else {
+      res.status(403).json({ message: "Require Staff Role" });
+    }
+  });
+};
