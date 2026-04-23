@@ -1,0 +1,143 @@
+👤 1. USER MODULE
+
+Features
+
+Register / Login
+
+Search stations
+
+View station details
+
+Book slot
+
+QR Code generation
+
+View booking history
+
+🏢 2. STATION STAFF MODULE
+
+Login
+
+Manage charging slots
+
+Approve/Reject bookings
+
+Update station details
+
+🧑‍🔧 3. WORKER MODULE
+
+View assigned service tasks
+
+Update task status
+
+🛡️ 4. ADMIN MODULE
+
+Verify users/stations
+
+View reports
+
+Handle complaints
+
+Manage system
+
+🔹 STEP 5: Database Design
+4
+🗄️ Tables
+1. Users Table
+Field	Type
+id	INT (PK)
+name	VARCHAR
+email	VARCHAR
+password	VARCHAR
+role	ENUM(user, staff, worker, admin)
+phone	VARCHAR
+2. Stations Table
+Field	Type
+id	INT
+name	VARCHAR
+location	VARCHAR
+total_slots	INT
+available_slots	INT
+staff_id	INT
+3. Slots Table
+
+| id | station_id | slot_time | status |
+
+4. Bookings Table
+Field	Type
+id	INT
+user_id	INT
+station_id	INT
+slot_id	INT
+date	DATE
+status	ENUM(pending, approved, rejected)
+qr_code	TEXT
+5. Workers Table
+
+| id | user_id | assigned_station |
+
+6. Complaints Table
+
+| id | user_id | message | status |
+
+🔹 STEP 6: API Endpoints
+Method	Route	Purpose
+POST	/api/register	User register
+POST	/api/login	Login
+GET	/api/stations	List stations
+POST	/api/book	Book slot
+GET	/api/bookings	User history
+PUT	/api/station/update	Staff updates station
+PUT	/api/booking/approve	Staff approval
+GET	/api/admin/users	Admin control
+🔹 STEP 7: QR Code Logic
+
+After booking → generate unique booking ID
+
+Use QR library
+
+Save QR image path in DB
+
+Staff scans to verify
+
+🔹 STEP 8: Authentication Flow
+4
+
+User logs in
+
+Server generates JWT
+
+Token sent in header
+
+Middleware verifies token
+
+🔹 STEP 9: Frontend Pages
+Page	Purpose
+index.html	Home
+login.html	Login
+register.html	Signup
+dashboard.html	User panel
+stations.html	List stations
+booking.html	Booking form
+admin.html	Admin panel
+🔹 STEP 10: Project Workflow
+
+Setup server
+
+Connect DB
+
+Build Auth
+
+Build User features
+
+Build Station staff module
+
+Add booking logic
+
+Add QR
+
+Add Admin
+
+Testing
+
+Deploy
